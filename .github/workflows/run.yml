@@ -17,7 +17,9 @@ jobs:
         with:
           php-version: '8.3'
 
-      # 💡 [수정] composer json이 없으므로 무의미한 composer install 단계를 삭제했습니다.
+      # 💡 [핵심 추가] 누락된 vendor 폴더와 패키지들을 설치합니다.
+      - name: Install dependencies
+        run: composer install --no-dev --prefer-dist --no-progress
 
       - name: Create private key file
         run: |
@@ -27,7 +29,6 @@ jobs:
       - name: Run Provisioning Script
         id: run_script
         run: |
-          # 💡 이미 파일이 최상단에 있으므로 바로 실행합니다.
           # PHP가 실패 코드(exit 1)를 던져도 워크플로우가 멈추지 않도록 || true를 붙입니다.
           OUTPUT=$(php index.php 2>&1) || true
           echo "$OUTPUT"
@@ -52,7 +53,6 @@ jobs:
           OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
 
       - name: Send Telegram Notification
-        # 실제 인스턴스가 성공적으로 생성되었을 때만 실행됩니다.
         if: steps.run_script.outputs.INSTANCE_CREATED == 'true'
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
