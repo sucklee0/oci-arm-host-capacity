@@ -20,13 +20,18 @@ jobs:
       - name: Install dependencies
         run: composer install --no-dev --prefer-dist --no-progress
 
+      # 💡 여기서 텍스트를 파일로 저장합니다
+      - name: Create private key file
+        run: echo "${{ secrets.OCI_KEY_CONTENT }}" > oci_private_key.pem
+
       - name: Run Provisioning Script
         run: php index.php
         env:
           OCI_USER_ID: ${{ secrets.OCI_USER }}
           OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY }}
           OCI_KEY_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
-          OCI_PRIVATE_KEY_CONTENT: ${{ secrets.OCI_KEY_CONTENT }}
+          # 💡 파일 경로를 넘겨줍니다
+          OCI_PRIVATE_KEY_FILENAME: oci_private_key.pem 
           OCI_REGION: ${{ secrets.OCI_REGION }}
           OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
           OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }}
