@@ -25,13 +25,22 @@ jobs:
         run: echo "${{ secrets.OCI_KEY_CONTENT }}" > oci_private_key.pem
 
       - name: Run Provisioning Script
-        run: php index.php
+        id: run_script
+        run: |
+          OUTPUT=$(php index.php)
+          echo "$OUTPUT"
+          
+          # 'Instance OCID' 대신, 실제 생성 시에만 발급되는 고유 ID 포맷(ocid1.instance)을 검사합니다.
+          if [[ "$OUTPUT" == *"ocid1.instance"* ]]; then
+            echo "INSTANCE_CREATED=true" >> $GITHUB_OUTPUT
+          else
+            echo "INSTANCE_CREATED=false" >> $GITHUB_OUTPUT
+          fi
         env:
           OCI_USER_ID: ${{ secrets.OCI_USER }}
           OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY }}
           OCI_KEY_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
-          # 💡 파일 경로를 넘겨줍니다
-          OCI_PRIVATE_KEY_FILENAME: oci_private_key.pem 
+          OCI_PRIVATE_KEY_FILENAME: oci_private_key.pem
           OCI_REGION: ${{ secrets.OCI_REGION }}
           OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
           OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }}
