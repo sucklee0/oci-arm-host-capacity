@@ -24,7 +24,7 @@ jobs:
           echo "${{ secrets.OCI_KEY_CONTENT }}" > oci_private_key.pem
           chmod 600 oci_private_key.pem
 
-- name: Run Provisioning Script
+      - name: Run Provisioning Script
         id: run_script
         run: |
           # 💡 이미 파일이 최상단에 있으므로 바로 실행합니다.
